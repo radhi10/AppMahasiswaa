@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+{% block title %}Selamat Datang — AppMahasiswa{% endblock %}
+{% block content %}
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <h1>🎓 Kelola Data Akademik dengan Mudah</h1>
+        <p class="mb-4">Platform terpadu untuk mengelola data mahasiswa, dosen, dan mata kuliah. Intuitif, cepat, dan aman.</p>
+        <div class="d-flex gap-3 flex-wrap">
+          <a class="btn btn-light btn-lg fw-bold" href="/mahasiswa/">
+            👥 Kelola Mahasiswa
+          </a>
+          <a class="btn btn-outline-light btn-lg fw-bold" href="/dosen/">
+            👨‍🏫 Kelola Dosen
+          </a>
+          <a class="btn btn-outline-light btn-lg fw-bold" href="/matakuliah/">
+            📚 Kelola Mata Kuliah
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-4 text-center">
+        <div style="font-size: 120px; opacity: 0.2;">📊</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics Section -->
+  <div class="mb-5">
+    <h2 class="section-title">📈 Statistik Terkini</h2>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card-compact stat-card">
+          <div class="card-body text-center py-4">
+            <div class="stat-label mb-2">Total Mahasiswa</div>
+            <div class="stat-number mb-3">{{ total_mahasiswa }}</div>
+            <small class="text-muted">Terdaftar dalam sistem</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card-compact stat-card">
+          <div class="card-body text-center py-4">
+            <div class="stat-label mb-2">Total Dosen</div>
+            <div class="stat-number mb-3">{{ total_dosen }}</div>
+            <small class="text-muted">Pengajar aktif</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card-compact stat-card">
+          <div class="card-body text-center py-4">
+            <div class="stat-label mb-2">Total Mata Kuliah</div>
+            <div class="stat-number mb-3">{{ total_matakuliah }}</div>
+            <small class="text-muted">Tersedia</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trend Chart Section -->
+  <div class="row g-4 mb-5">
+    <div class="col-lg-6">
+      <div class="card-compact">
+        <div class="card-body">
+          <h5 class="card-title d-flex align-items-center">
+            <span style="font-size: 1.3rem; margin-right: 0.5rem;">📊</span>
+            Pertumbuhan 6 Bulan Terakhir
+          </h5>
+          <canvas id="trendChart" style="max-height: 250px;"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card-compact">
+        <div class="card-body">
+          <h5 class="card-title mb-4">⚡ Fitur Unggulan</h5>
+          <ul class="list-unstyled">
+            <li class="mb-3 d-flex align-items-start">
+              <span style="color: #667eea; font-weight: bold; margin-right: 1rem;">✓</span>
+              <div>
+                <strong>Manajemen Data Real-time</strong>
+                <p class="text-muted mb-0" style="font-size: 0.9rem;">Update dan lihat perubahan data secara langsung</p>
+              </div>
+            </li>
+            <li class="mb-3 d-flex align-items-start">
+              <span style="color: #4facfe; font-weight: bold; margin-right: 1rem;">✓</span>
+              <div>
+                <strong>Dashboard Intuitif</strong>
+                <p class="text-muted mb-0" style="font-size: 0.9rem;">Antarmuka yang mudah digunakan untuk semua kalangan</p>
+              </div>
+            </li>
+            <li class="mb-3 d-flex align-items-start">
+              <span style="color: #f5576c; font-weight: bold; margin-right: 1rem;">✓</span>
+              <div>
+                <strong>Statistik Mendalam</strong>
+                <p class="text-muted mb-0" style="font-size: 0.9rem;">Analisis data dengan grafik interaktif</p>
+              </div>
+            </li>
+            <li class="d-flex align-items-start">
+              <span style="color: #764ba2; font-weight: bold; margin-right: 1rem;">✓</span>
+              <div>
+                <strong>Keamanan Terjamin</strong>
+                <p class="text-muted mb-0" style="font-size: 0.9rem;">Data terenkripsi dan terlindungi dengan sistem autentikasi</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- System Info -->
+  <div class="alert alert-info alert-dismissible fade show" role="alert">
+    <h5 class="alert-heading">💡 Tips Penggunaan</h5>
+    <p class="mb-0">Gunakan menu di atas untuk navigasi cepat ke setiap modul. Setiap data dapat diedit atau dihapus dengan tombol aksi di tabel. Untuk informasi lebih lanjut, kunjungi <strong>Dashboard Admin</strong>.</p>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Statistics
+  const months = {{ trend_months|safe }};
+  const mahasiswaTrend = {{ mahasiswa_trend|safe }};
+  const dosenTrend = {{ dosen_trend|safe }};
+  const matakuliahTrend = {{ matakuliah_trend|safe }};
+
+  // Trend Chart
+  const ctx = document.getElementById('trendChart');
+  if(ctx) {
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: months,
+        datasets: [
+          {
+            label: 'Mahasiswa',
+            data: mahasiswaTrend,
+            borderColor: 'rgba(75,192,192,0.9)',
+            backgroundColor: 'rgba(75,192,192,0.1)',
+            tension: 0.4,
+            fill: true,
+            pointRadius: 4,
+            pointBackgroundColor: 'rgba(75,192,192,0.9)',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointHoverRadius: 6,
+          },
+          {
+            label: 'Dosen',
+            data: dosenTrend,
+            borderColor: 'rgba(40,167,69,0.9)',
+            backgroundColor: 'rgba(40,167,69,0.1)',
+            tension: 0.4,
+            fill: true,
+            pointRadius: 4,
+            pointBackgroundColor: 'rgba(40,167,69,0.9)',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointHoverRadius: 6,
+          },
+          {
+            label: 'Mata Kuliah',
+            data: matakuliahTrend,
+            borderColor: 'rgba(54,162,235,0.9)',
+            backgroundColor: 'rgba(54,162,235,0.1)',
+            tension: 0.4,
+            fill: true,
+            pointRadius: 4,
+            pointBackgroundColor: 'rgba(54,162,235,0.9)',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointHoverRadius: 6,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top',
+            labels: {
+              usePointStyle: true,
+              padding: 15,
+              font: { size: 12, weight: '600' }
+            }
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            padding: 12,
+            cornerRadius: 8,
+            titleFont: { size: 13, weight: '600' },
+            bodyFont: { size: 12 }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              drawBorder: false,
+              color: 'rgba(0,0,0,0.05)'
+            },
+            ticks: {
+              font: { size: 11 }
+            }
+          },
+          x: {
+            grid: {
+              display: false,
+              drawBorder: false
+            },
+            ticks: {
+              font: { size: 11 }
+            }
+          }
+        }
+      }
+    });
+  }
+  
+  // Sparklines for stat cards
+  function smallSparkline(ctx, data, color){
+    new Chart(ctx, {
+      type: 'line',
+      data: { 
+        labels: months, 
+        datasets: [{ 
+          data: data, 
+          borderColor: color, 
+          backgroundColor: 'transparent', 
+          tension: 0.3, 
+          pointRadius: 0,
+          borderWidth: 2
+        }] 
+      },
+      options: { 
+        plugins:{legend:{display:false}}, 
+        scales:{ x:{display:false}, y:{display:false} }, 
+        elements:{line:{borderWidth:2}} 
+      }
+    });
+  }
+
+  document.querySelectorAll('.stat-card').forEach((card)=>{
+    const label = card.querySelector('.stat-label')?.innerText || '';
+    const canvas = document.createElement('canvas'); 
+    canvas.style.width='100%'; 
+    canvas.style.height='40px';
+    canvas.className = 'd-block mx-auto mt-3';
+    
+    if(label.includes('Mahasiswa')){ 
+      card.appendChild(canvas); 
+      smallSparkline(canvas.getContext('2d'), mahasiswaTrend, 'rgba(75,192,192,0.9)'); 
+    }
+    else if(label.includes('Dosen')){ 
+      card.appendChild(canvas); 
+      smallSparkline(canvas.getContext('2d'), dosenTrend, 'rgba(40,167,69,0.9)'); 
+    }
+    else if(label.includes('Mata Kuliah')){ 
+      card.appendChild(canvas); 
+      smallSparkline(canvas.getContext('2d'), matakuliahTrend, 'rgba(54,162,235,0.9)'); 
+    }
+  });
+</script>
+{% endblock %}

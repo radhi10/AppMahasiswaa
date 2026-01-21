@@ -1,2 +1,1 @@
-# AppMahasiswaa
-django
+# Project Django
